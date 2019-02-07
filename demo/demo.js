@@ -184,7 +184,9 @@ function renderFrame(){
 
 	var start = new Date().getTime();
 
-	gifCtx.clearRect(0, 0, c.width, c.height);
+	if (!(frame.hasOwnProperty("transparentIndex") && (frame.disposalType == 1))) {
+	    gifCtx.clearRect(0, 0, c.width, c.height);
+	}
 
 	// draw the patch
 	drawPatch(frame);
