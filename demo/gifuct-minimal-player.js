@@ -20,20 +20,20 @@ var gif;
 function loadGIF(){
 	var oReq = new XMLHttpRequest();
 	oReq.open("GET", url.value, true);
-	oReq.responseType = "arraybuffer";
+        oReq.responseType = "arraybuffer";
 
-	oReq.onload = function (oEvent) {
-	    var arrayBuffer = oReq.response; // Note: not oReq.responseText
-	    if (arrayBuffer) {
-	        gif = new GIF(arrayBuffer);
-	        var frames = gif.decompressFrames(true);
-	        console.log(gif);
-	        // render the gif
-	        renderGIF(frames);
-	    }
-	};
+        oReq.onload = function (oEvent) {
+            var arrayBuffer = oReq.response; // Note: not oReq.responseText
+            if (arrayBuffer) {
+                gif = new GIF(arrayBuffer);
+                var frames = gif.decompressFrames(true);
+                console.log(gif);
+                // render the gif
+                renderGIF(frames);
+            }
+        };
 
-	oReq.send(null);
+        oReq.send(null);
 }
 
 var playing = false;
