@@ -37,10 +37,6 @@ function loadGIF(){
 }
 
 var playing = false;
-var bEdgeDetect = false;
-var bInvert = false;
-var bGrayscale = false;
-var pixelPercent = 100;
 var loadedFrames;
 var frameIndex;
 
@@ -86,96 +82,10 @@ function drawPatch(frame){
 	gifCtx.drawImage(tempCanvas, dims.left, dims.top);
 }
 
-var edge = function(data, output){
-
-	var odata = output.data;
-	var width = gif.raw.lsd.width;
-	var height = gif.raw.lsd.height;
-
-	var conv = [-1, -1, -1, 
-				-1, 8, -1,
-				-1, -1, -1];
-	var halfside = Math.floor(3/2);
-
-	for(var y=0; y<height; y++){
-		for(var x=0; x<width; x++){
-
-			var r=0, g=0, b=0;
-			for(var cy=0; cy<3; cy++){
-				for(var cx=0; cx<3; cx++){
-
-					var scy = (y - halfside + cy);
-					var scx = (x - halfside + cx);
-
-					if(scy >= 0 && scy < height && scx >= 0 && scx < width){
-						var src = (scy * width + scx) * 4;
-						var f= cy * 3 + cx;
-						r += data[src] * conv[f];
-						g += data[src + 1] * conv[f];
-						b += data[src + 2] * conv[f];
-					}
-				}
-			}
-
-			var i = (y * width + x) * 4;
-			odata[i]     = r;
-			odata[i + 1] = g;
-			odata[i + 2] = b;
-			odata[i + 3] = 255;
-		}
-	}
-
-	return output;
-}
-
-var invert = function(data) {
-	for (var i = 0; i < data.length; i += 4) {
-		data[i]     = 255 - data[i];     // red
-		data[i + 1] = 255 - data[i + 1]; // green
-		data[i + 2] = 255 - data[i + 2]; // blue
-		data[i + 3] = 255;
-	}
-};
-
-var grayscale = function(data) {
-	for (var i = 0; i < data.length; i += 4) {
-		var avg = (data[i] + data[i +1] + data[i +2]) / 3;
-		data[i]     = avg; // red
-		data[i + 1] = avg; // green
-		data[i + 2] = avg; // blue
-		data[i + 3] = 255;
-	}
-};
-
 function manipulate(){
 	var imageData = gifCtx.getImageData(0, 0, gifCanvas.width, gifCanvas.height);
-	var other = gifCtx.createImageData(gifCanvas.width, gifCanvas.height);
-
-	if(bEdgeDetect){
-		imageData = edge(imageData.data, other);
-	}
-
-	if(bInvert){
-		invert(imageData.data);	
-	}
-
-	if(bGrayscale){
-		grayscale(imageData.data);
-	}
-
-	// do pixelation
-	var pixelsX = 5 + Math.floor(pixelPercent / 100 * (c.width - 5));
-	var pixelsY = (pixelsX * c.height) / c.width;
-
-	if(pixelPercent != 100){
-		ctx.mozImageSmoothingEnabled = false;
-		ctx.webkitImageSmoothingEnabled = false;
-		ctx.imageSmoothingEnabled = false;
-	}
 
 	ctx.putImageData(imageData, 0, 0);
-	ctx.drawImage(c, 0, 0, c.width, c.height, 0, 0, pixelsX, pixelsY);
-	ctx.drawImage(c, 0, 0, pixelsX, pixelsY, 0, 0, c.width, c.height);
 }
 
 function renderFrame(){
