@@ -41,83 +41,83 @@ var loadedFrames;
 var frameIndex;
 
 function playpause(){
-	playing = !playing;
-	if(playing){
-		renderFrame();
-	}
+        playing = !playing;
+        if(playing){
+                renderFrame();
+        }
 }
 
 function renderGIF(frames){
-	loadedFrames = frames;
-	frameIndex = 0;
+        loadedFrames = frames;
+        frameIndex = 0;
 
-	c.width = frames[0].dims.width;
-	c.height = frames[0].dims.height;
+        c.width = frames[0].dims.width;
+        c.height = frames[0].dims.height;
 
-	gifCanvas.width = c.width;
-	gifCanvas.height = c.height;
+        gifCanvas.width = c.width;
+        gifCanvas.height = c.height;
 
-	if(!playing){
-		playpause();
-	}
+        if(!playing){
+                playpause();
+        }
 }
 
 var frameImageData;
 
 function drawPatch(frame){
-	var dims = frame.dims;
+        var dims = frame.dims;
 
-	if(!frameImageData || dims.width != frameImageData.width || dims.height != frameImageData.height){
-		tempCanvas.width = dims.width;
-		tempCanvas.height = dims.height;
-		frameImageData = tempCtx.createImageData(dims.width, dims.height);
-	}
+        if(!frameImageData || dims.width != frameImageData.width || dims.height != frameImageData.height){
+                tempCanvas.width = dims.width;
+                tempCanvas.height = dims.height;
+                frameImageData = tempCtx.createImageData(dims.width, dims.height);
+        }
 
-	// set the patch data as an override
-	frameImageData.data.set(frame.patch);
+        // set the patch data as an override
+        frameImageData.data.set(frame.patch);
 
-	// draw the patch back over the canvas
-	tempCtx.putImageData(frameImageData, 0, 0);
+        // draw the patch back over the canvas
+        tempCtx.putImageData(frameImageData, 0, 0);
 
-	gifCtx.drawImage(tempCanvas, dims.left, dims.top);
+        gifCtx.drawImage(tempCanvas, dims.left, dims.top);
 }
 
 function manipulate(){
-	var imageData = gifCtx.getImageData(0, 0, gifCanvas.width, gifCanvas.height);
+        var imageData = gifCtx.getImageData(0, 0, gifCanvas.width, gifCanvas.height);
 
-	ctx.putImageData(imageData, 0, 0);
+        ctx.putImageData(imageData, 0, 0);
 }
 
 function renderFrame(){
-	// get the frame
-	var frame = loadedFrames[frameIndex];
+        // get the frame
+        var frame = loadedFrames[frameIndex];
 
-	var start = new Date().getTime();
+        var start = new Date().getTime();
 
-	if (!(frame.hasOwnProperty("transparentIndex") && (frame.disposalType == 1))) {
-	    gifCtx.clearRect(0, 0, c.width, c.height);
-	}
+        if (!(frame.hasOwnProperty("transparentIndex") && (frame.disposalType == 1))) {
+            gifCtx.clearRect(0, 0, c.width, c.height);
+        }
 
-	// draw the patch
-	drawPatch(frame);
+        // draw the patch
+        drawPatch(frame);
 
-	// perform manipulation
-	manipulate();
+        // perform manipulation
+        manipulate();
 
-	// update the frame index
-	frameIndex++;
-	if(frameIndex >= loadedFrames.length){
-		frameIndex = 0;
-	}
+        // update the frame index
+        frameIndex++;
+        if(frameIndex >= loadedFrames.length){
+                frameIndex = 0;
+        }
 
-	var end = new Date().getTime();
-	var diff = end - start;
+        var end = new Date().getTime();
+        var diff = end - start;
 
-	if(playing){
-		// delay the next gif frame
-		setTimeout(function(){
-			requestAnimationFrame(renderFrame);
-			//renderFrame();
-		}, Math.max(0, Math.floor(frame.delay - diff)));
-	}
+        if(playing){
+                // delay the next gif frame
+                setTimeout(function(){
+                        requestAnimationFrame(renderFrame);
+                        //renderFrame();
+                }, Math.max(0, Math.floor(frame.delay - diff)));
+        }
 }
