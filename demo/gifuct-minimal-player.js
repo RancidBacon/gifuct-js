@@ -13,13 +13,13 @@ var url = document.getElementById('url');
 url.value = '/demo/horses.gif';
 
 // load the default gif
-loadGIF();
+loadGIF(url.value);
 var gif;
 
-// load a gif with the current input url value
-function loadGIF(){
+// load a gif from the supplied url value
+function loadGIF(gifUrl){
         var oReq = new XMLHttpRequest();
-        oReq.open("GET", url.value, true);
+        oReq.open("GET", gifUrl, true);
         oReq.responseType = "arraybuffer";
 
         oReq.onload = function (oEvent) {
