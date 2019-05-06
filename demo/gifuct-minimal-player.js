@@ -18,8 +18,8 @@ var gif;
 
 // load a gif with the current input url value
 function loadGIF(){
-	var oReq = new XMLHttpRequest();
-	oReq.open("GET", url.value, true);
+        var oReq = new XMLHttpRequest();
+        oReq.open("GET", url.value, true);
         oReq.responseType = "arraybuffer";
 
         oReq.onload = function (oEvent) {
