@@ -33,7 +33,7 @@ function loadGIF(){
 	    }
 	};
 
-	oReq.send(null);	
+	oReq.send(null);
 }
 
 var playing = false;
@@ -70,13 +70,13 @@ var frameImageData;
 
 function drawPatch(frame){
 	var dims = frame.dims;
-	
+
 	if(!frameImageData || dims.width != frameImageData.width || dims.height != frameImageData.height){
 		tempCanvas.width = dims.width;
 		tempCanvas.height = dims.height;
-		frameImageData = tempCtx.createImageData(dims.width, dims.height);	
+		frameImageData = tempCtx.createImageData(dims.width, dims.height);
 	}
-	
+
 	// set the patch data as an override
 	frameImageData.data.set(frame.patch);
 
