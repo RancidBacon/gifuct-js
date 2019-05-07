@@ -23,5 +23,8 @@
   ],
   "devDependencies": {
     "js-binary-schema-parser": "~1.0.0"
+  },
+  "dependencies": {
+    "gifuct-js": "^1.0.0"
   }
 }
