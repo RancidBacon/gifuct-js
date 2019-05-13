@@ -95,6 +95,9 @@ function manipulate(){
         ctx.putImageData(imageData, 0, 0);
 }
 
+
+var playback_start_time = -1;
+
 function renderFrame(){
         // get the frame
         var frame = loadedFrames[frameIndex];
@@ -117,6 +120,7 @@ function renderFrame(){
             source.connect(audioCtx.destination);
             source.buffer = audio_pcm_data;
             source.start();
+            playback_start_time = start;
         }
 
 
@@ -132,10 +136,24 @@ function renderFrame(){
         var diff = end - start;
 
         if(playing){
+            //
+            // The monstrosity in the next line of code is intended to
+            // improve playback of longer duration Audio GIFS. It should
+            // ensure that the last frame of the GIF displays as the audio
+            // finishes playing (i.e. somewhat in sync).
+            //
+            // Note: The way this is currently implemented means that all
+            //       supplied per-frame delay values are ignored except for
+            //       the final frame.
+            //
+            // TODO: Double check this calculation is correct and/or handle
+            //       variable per-frame delay values.
+            //
+            var nextDelay = ((playback_start_time > -1) && (frameIndex != 0)) ? ((playback_start_time + (((audio_pcm_data.duration * 1000) / (loadedFrames.length-1))*(frameIndex+1))) - end) : frame.delay;
                 // delay the next gif frame
                 setTimeout(function(){
                         requestAnimationFrame(renderFrame);
                         //renderFrame();
-                }, Math.max(0, Math.floor(frame.delay - diff)));
+                }, Math.max(0, Math.floor(nextDelay)));
         }
 }
