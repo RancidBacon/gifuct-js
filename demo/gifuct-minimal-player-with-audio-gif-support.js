@@ -34,12 +34,12 @@ function loadGIF(gifUrl){
                 // TODO: Check AUDIOGIF header, version, type etc...
                 audio_wav_data = new Uint8Array(gif.raw.frames[0].application.blocks.slice(1));
                 audioCtx.decodeAudioData(audio_wav_data.buffer).then(function(decodedData){
-                  console.log(decodedData);
+                  ////console.log(decodedData);
                   audio_pcm_data = decodedData;
                 });
 
                 var frames = gif.decompressFrames(true);
-                console.log(gif);
+                ////console.log(gif);
                 // render the gif
                 renderGIF(frames);
             }
