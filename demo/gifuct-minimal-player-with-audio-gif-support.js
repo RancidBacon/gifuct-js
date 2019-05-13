@@ -10,12 +10,7 @@ var gifCtx = gifCanvas.getContext('2d');
 
 var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-var url = document.getElementById('url');
-// default (audio!) gif
-url.value = '/demo/audio-gif-sting.a.gif';
 
-// load the default gif
-loadGIF(url.value);
 var gif;
 var audio_pcm_data;
 

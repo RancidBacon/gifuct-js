@@ -23,5 +23,13 @@
 
 	<script src="/dist/gifuct-js.js"></script>
 	<script src="gifuct-minimal-player-with-audio-gif-support.js"></script>
+	<script>
+	var url = document.getElementById('url');
+	// default (audio!) gif
+	url.value = '/demo/audio-gif-sting.a.gif';
+
+	// load the default gif
+	loadGIF(url.value);
+	</script>
 </body>
 </html>
