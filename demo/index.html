@@ -12,12 +12,12 @@
 		<button onclick="loadGIF(url.value)">Load</button>
 		<button onclick="playpause()">Play/Pause</button>
 	</div>
-	<div style="margin-bottom: 10px;">
+	<div style="margin-bottom: 10px; display: none;">
 		<input id="grayscale" type="checkbox" onchange="bEdgeDetect = !bEdgeDetect"> Edge Detect
 		<input id="invert" type="checkbox" onchange="bInvert = !bInvert;"> Invert Colours
 		<input id="grayscale" type="checkbox" onchange="bGrayscale = !bGrayscale"> Grayscale
 	</div>
-	<div>
+	<div style="display: none;">
 		<input id="pixels" type="range" min="0" max="100" step="1" value="100" oninput="pixelPercent = value;"> Pixelate Amount
 	</div>
 
