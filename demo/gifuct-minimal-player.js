@@ -8,13 +8,17 @@ var tempCtx = tempCanvas.getContext('2d');
 var gifCanvas = document.createElement('canvas');
 var gifCtx = gifCanvas.getContext('2d');
 
+var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
 var url = document.getElementById('url');
-// default gif
-url.value = '/demo/horses.gif';
+// default (audio!) gif
+url.value = '/demo/audio-gif-sting.a.gif';
 
 // load the default gif
 loadGIF(url.value);
 var gif;
+var audio_pcm_data;
+
 
 // load a gif from the supplied url value
 function loadGIF(gifUrl){
@@ -26,6 +30,14 @@ function loadGIF(gifUrl){
             var arrayBuffer = oReq.response; // Note: not oReq.responseText
             if (arrayBuffer) {
                 gif = new GIF(arrayBuffer);
+
+                // TODO: Check AUDIOGIF header, version, type etc...
+                audio_wav_data = new Uint8Array(gif.raw.frames[0].application.blocks.slice(1));
+                audioCtx.decodeAudioData(audio_wav_data.buffer).then(function(decodedData){
+                  console.log(decodedData);
+                  audio_pcm_data = decodedData;
+                });
+
                 var frames = gif.decompressFrames(true);
                 console.log(gif);
                 // render the gif
@@ -104,10 +116,21 @@ function renderFrame(){
         // perform manipulation
         manipulate();
 
-        // update the frame index
-        frameIndex++;
-        if(frameIndex >= loadedFrames.length){
+
+        if ((frameIndex==0) && audio_pcm_data) {
+            var source = audioCtx.createBufferSource();
+            source.connect(audioCtx.destination);
+            source.buffer = audio_pcm_data;
+            source.start();
+        }
+
+
+        if (audio_pcm_data) {
+            // update the frame index
+            frameIndex++;
+            if(frameIndex >= loadedFrames.length){
                 frameIndex = 0;
+            }
         }
 
         var end = new Date().getTime();
