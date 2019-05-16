@@ -9,7 +9,7 @@
 	</div>
 	<div style="margin: 10px 0;">
 		<input id="url" type="text"/>
-		<button onclick="loadGIF(url.value)">Load</button>
+		<button onclick="setGIF(url.value)">Load</button>
 		<button onclick="playpause()">Play/Pause</button>
 	</div>
 	<div style="margin-bottom: 10px; display: none;">
@@ -29,7 +29,7 @@
 	url.value = '/demo/audio-gif-sting.a.gif';
 
 	// load the default gif
-	loadGIF(url.value);
+	setGIF(url.value);
 	</script>
 </body>
 </html>

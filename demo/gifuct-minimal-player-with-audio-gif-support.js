@@ -27,16 +27,16 @@ function loadGIF(gifUrl){
                 gif = new GIF(arrayBuffer);
 
                 // TODO: Check AUDIOGIF header, version, type etc...
-                audio_wav_data = new Uint8Array(gif.raw.frames[0].application.blocks.slice(1));
-                audioCtx.decodeAudioData(audio_wav_data.buffer).then(function(decodedData){
-                  ////console.log(decodedData);
-                  audio_pcm_data = decodedData;
+                audio_wav_data = new Uint8Array(gif.raw.frames[0].application.blocks.subarray(1));
+                audioCtx.decodeAudioData(audio_wav_data.buffer, function(decodedData) {
+                        ////console.log(decodedData);
+                        audio_pcm_data = decodedData;
                 });
 
                 var frames = gif.decompressFrames(true);
                 ////console.log(gif);
                 // render the gif
-                renderGIF(frames);
+                renderGIF(frames, gifUrl);
             }
         };
 
@@ -54,19 +54,136 @@ function playpause(){
         }
 }
 
-function renderGIF(frames){
+function wrapWithLink(gifUrl) {
+
+        // Make "Save Link As..." work
+        // TODO: Make "Save Image As..." work?
+        // TODO: Don't recreate if already exists.
+        var img_link = document.createElement("a")
+        img_link.href = gifUrl;
+        img_link.className = "img_link";
+        c.parentElement.insertBefore(img_link, c);
+        img_link.appendChild(c);
+
+}
+
+
+function setMessage(target_ctx, msg_fill_style, font_size_line_1, font_size_line_2, msg_line_1, msg_line_2) {
+
+        // TODO: Do this better... :)
+        target_ctx.textAlign = "center";
+        target_ctx.textBaseline = "middle";
+
+        target_ctx.fillStyle = msg_fill_style;
+
+        target_ctx.font = font_size_line_1 + "px sans-serif";
+        target_ctx.fillText(msg_line_1, target_ctx.canvas.width/2, ((target_ctx.canvas.height-font_size_line_1)/2)-(font_size_line_1*0.625));
+
+        target_ctx.font = font_size_line_2 + "px sans-serif";
+        target_ctx.fillText(msg_line_2, target_ctx.canvas.width/2, ((target_ctx.canvas.height-font_size_line_2)/2)+(font_size_line_2*0.625));
+
+}
+
+
+function setGIF(url) {
+
+        // Everyone loves a "loading..." message...
+        // TODO: Do this better... :)
+        const placeholder_width = 400; // px
+        const font_size = 14; // px
+
+        c.width = placeholder_width;
+        c.height = placeholder_width;
+
+        c.style.width = placeholder_width;
+        c.style.height = placeholder_width;
+
+        setMessage(ctx, "#eb99a1", font_size, font_size, "Audio GIF", "loading");
+
+        // Actually start loading of the file...
+        loadGIF(url);
+
+}
+
+
+function renderWhenAudioReady(gifUrl) {
+
+        // Due to chang(ing|ed) WebAudio auto-play policies we need to detect when
+        // we're not auto-playing and prompt the person viewing the page to interact
+        // with the page.
+
+        // TODO: Handle this better?
+
+        audioCtx.resume();
+
+        if (audioCtx.state == "suspended") {
+
+                // TODO: Limit to events on the placeholder so we don't break the links?
+                // TODO: Fix handling of right click.
+                document.body.addEventListener('click', unlockAudioContext, true);
+                document.body.addEventListener('touchstart', unlockAudioContext, true);
+                document.body.addEventListener('touchend', unlockAudioContext, true);
+
+                ctx.fillStyle = "#C7E3BE";
+                ctx.fillRect(0, 0, c.width, c.height);
+
+                setMessage(ctx, "#4a4a4a", 48, 24, "touch or click", "to hear the future of GIF");
+
+                setTimeout(function() {renderWhenAudioReady(gifUrl);}, 100);
+                return;
+        }
+
+        wrapWithLink(gifUrl);
+
+        if(!playing){
+                playpause();
+        }
+
+}
+
+
+function unlockAudioContext(event) {
+        // TODO: Handle this better?
+        event.preventDefault();
+        audioCtx.resume().then(function() {
+                document.body.removeEventListener('click', unlockAudioContext, true);
+                document.body.removeEventListener('touchend', unlockAudioContext, true);
+                document.body.removeEventListener('touchstart', unlockAudioContext, true);
+        });
+};
+
+
+// TODO: Make this optional.
+function zoomOutMobile(targetWidth) {
+
+        // via <https://stackoverflow.com/questions/22639296/force-mobile-browser-zoom-out-with-javascript>
+
+        var viewport = document.querySelector('meta[name="viewport"]');
+
+        if (viewport) {
+                viewport.content = "initial-scale=0.1";
+                viewport.content = "width=" + (targetWidth/0.90);
+        }
+
+}
+
+
+function renderGIF(frames, gifUrl){
         loadedFrames = frames;
         frameIndex = 0;
 
         c.width = frames[0].dims.width;
         c.height = frames[0].dims.height;
 
+        c.style.width = c.width;
+        c.style.height = c.height;
+
         gifCanvas.width = c.width;
         gifCanvas.height = c.height;
 
-        if(!playing){
-                playpause();
-        }
+        zoomOutMobile(c.width);
+
+        renderWhenAudioReady(gifUrl);
 }
 
 var frameImageData;
@@ -99,6 +216,7 @@ function manipulate(){
 var playback_start_time = -1;
 
 function renderFrame(){
+
         // get the frame
         var frame = loadedFrames[frameIndex];
 
